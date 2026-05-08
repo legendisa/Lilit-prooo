@@ -1,0 +1,33 @@
+name: Lilit Pro APK Build
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip autoconf autotools-dev libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.33
+
+      - name: Build with Buildozer
+        run: |
+          yes | buildozer android debug
+        continue-on-error: true
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
+        with:
+          name: Lilit-Pro-Installer
+          path: bin/*.apk
